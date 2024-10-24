@@ -1,0 +1,255 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(simple_glomap)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(Eigen3 REQUIRED)
+find_package(Ceres REQUIRED)
+find_package(Boost REQUIRED)
+
+# third
+## poselib
+set(POSELIB_SOURCES
+    third/PoseLib/solvers/gp3p.cc
+    third/PoseLib/solvers/gp4ps.cc
+    third/PoseLib/solvers/p1p2ll.cc
+    third/PoseLib/solvers/p2p1ll.cc
+    third/PoseLib/solvers/p2p2pl.cc
+    third/PoseLib/solvers/p3ll.cc
+    third/PoseLib/solvers/p3p.cc
+    third/PoseLib/solvers/p3p_ding.cc
+    third/PoseLib/solvers/p4pf.cc
+    third/PoseLib/solvers/p5lp_radial.cc
+    third/PoseLib/solvers/p6lp.cc
+    third/PoseLib/solvers/ugp2p.cc
+    third/PoseLib/solvers/ugp3ps.cc
+    third/PoseLib/solvers/up1p2pl.cc
+    third/PoseLib/solvers/up2p.cc
+    third/PoseLib/solvers/up1p1ll.cc
+    third/PoseLib/solvers/up4pl.cc
+    third/PoseLib/solvers/ugp4pl.cc
+    third/PoseLib/solvers/relpose_upright_3pt.cc
+    third/PoseLib/solvers/relpose_upright_planar_2pt.cc
+    third/PoseLib/solvers/relpose_upright_planar_3pt.cc
+    third/PoseLib/solvers/relpose_8pt.cc
+    third/PoseLib/solvers/relpose_5pt.cc
+    third/PoseLib/solvers/relpose_7pt.cc
+    third/PoseLib/solvers/relpose_6pt_focal.cc
+    third/PoseLib/solvers/gen_relpose_upright_4pt.cc
+    third/PoseLib/solvers/gen_relpose_5p1pt.cc
+    third/PoseLib/solvers/gen_relpose_6pt.cc
+    third/PoseLib/solvers/homography_4pt.cc
+    third/PoseLib/misc/qep.cc
+    third/PoseLib/misc/univariate.cc
+    third/PoseLib/misc/essential.cc
+    third/PoseLib/misc/re3q3.cc
+    third/PoseLib/misc/colmap_models.cc
+    third/PoseLib/misc/decompositions.cc
+    third/PoseLib/robust.cc
+    third/PoseLib/robust/ransac.cc
+    third/PoseLib/robust/bundle.cc
+    third/PoseLib/robust/utils.cc
+    third/PoseLib/robust/sampling.cc
+    third/PoseLib/robust/estimators/absolute_pose.cc
+    third/PoseLib/robust/estimators/relative_pose.cc
+    third/PoseLib/robust/estimators/hybrid_pose.cc
+    third/PoseLib/robust/estimators/homography.cc
+)
+
+set(POSELIB_HEADERS
+    third/PoseLib/solvers/gp3p.h
+    third/PoseLib/solvers/gp4ps.h
+    third/PoseLib/solvers/p1p2ll.h
+    third/PoseLib/solvers/p2p1ll.h
+    third/PoseLib/solvers/p2p2pl.h
+    third/PoseLib/solvers/p3ll.h
+    third/PoseLib/solvers/p3p.h
+    third/PoseLib/solvers/p3p_ding.h
+    third/PoseLib/solvers/p4pf.h
+    third/PoseLib/solvers/p5lp_radial.h
+    third/PoseLib/solvers/p6lp.h
+    third/PoseLib/solvers/ugp2p.h
+    third/PoseLib/solvers/ugp3ps.h
+    third/PoseLib/solvers/up1p2pl.h
+    third/PoseLib/solvers/up2p.h
+    third/PoseLib/solvers/up1p1ll.h
+    third/PoseLib/solvers/up4pl.h
+    third/PoseLib/solvers/ugp4pl.h
+    third/PoseLib/solvers/relpose_upright_3pt.h
+    third/PoseLib/solvers/relpose_upright_planar_2pt.h
+    third/PoseLib/solvers/relpose_upright_planar_3pt.h
+    third/PoseLib/solvers/relpose_8pt.h
+    third/PoseLib/solvers/relpose_5pt.h
+    third/PoseLib/solvers/relpose_7pt.h
+    third/PoseLib/solvers/relpose_6pt_focal.h
+    third/PoseLib/solvers/gen_relpose_upright_4pt.h
+    third/PoseLib/solvers/gen_relpose_5p1pt.h
+    third/PoseLib/solvers/gen_relpose_6pt.h
+    third/PoseLib/solvers/homography_4pt.h
+    third/PoseLib/misc/quaternion.h
+    third/PoseLib/misc/colmap_models.h
+    third/PoseLib/misc/qep.h
+    third/PoseLib/misc/univariate.h
+    third/PoseLib/misc/sturm.h
+    third/PoseLib/misc/essential.h
+    third/PoseLib/misc/re3q3.h
+    third/PoseLib/misc/decompositions.h
+    third/PoseLib/robust.h
+    third/PoseLib/types.h
+    third/PoseLib/camera_pose.h
+    third/PoseLib/alignment.h
+    third/PoseLib/robust/ransac.h
+    third/PoseLib/robust/ransac_impl.h
+    third/PoseLib/robust/bundle.h
+    third/PoseLib/robust/utils.h
+    third/PoseLib/robust/sampling.h
+    third/PoseLib/robust/lm_impl.h
+    third/PoseLib/robust/jacobian_impl.h
+    third/PoseLib/robust/estimators/absolute_pose.h
+    third/PoseLib/robust/estimators/relative_pose.h
+    third/PoseLib/robust/estimators/hybrid_pose.h
+    third/PoseLib/robust/estimators/homography.h
+)
+
+## colmap
+set(COLMAP_SOURCES
+    third/colmap/estimators/essential_matrix.cc
+    third/colmap/estimators/fundamental_matrix.cc
+    third/colmap/estimators/homography_matrix.cc
+    third/colmap/estimators/two_view_geometry.cc
+    third/colmap/estimators/utils.cc
+    third/colmap/feature/types.cc
+    third/colmap/geometry/essential_matrix.cc
+    third/colmap/geometry/gps.cc
+    third/colmap/geometry/homography_matrix.cc
+    third/colmap/geometry/pose.cc
+    third/colmap/geometry/sim3.cc
+    third/colmap/geometry/triangulation.cc
+    third/colmap/math/math.cc
+    third/colmap/math/polynomial.cc
+    third/colmap/math/random.cc
+    third/colmap/optim/random_sampler.cc
+    third/colmap/optim/support_measurement.cc
+    third/colmap/scene/camera.cc
+    third/colmap/scene/database.cc
+    third/colmap/scene/image.cc
+    third/colmap/scene/projection.cc
+    third/colmap/scene/two_view_geometry.cc
+    third/colmap/scene/visibility_pyramid.cc
+    third/colmap/sensor/models.cc
+    third/colmap/util/logging.cc
+    third/colmap/util/misc.cc
+    third/colmap/util/string.cc
+    third/colmap/util/threading.cc
+    third/colmap/util/timer.cc
+)
+
+set(COLMAP_HEADERS
+    third/colmap/estimators/cost_functions.h
+    third/colmap/estimators/essential_matrix_coeffs.h
+    third/colmap/estimators/essential_matrix_poly.h
+    third/colmap/estimators/essential_matrix.h
+    third/colmap/estimators/fundamental_matrix.h
+    third/colmap/estimators/homography_matrix.h
+    third/colmap/estimators/manifold.h
+    third/colmap/estimators/translation_transform.h
+    third/colmap/estimators/two_view_geometry.h
+    third/colmap/estimators/utils.h
+    third/colmap/feature/types.h
+    third/colmap/geometry/essential_matrix.h
+    third/colmap/geometry/gps.h
+    third/colmap/geometry/homography_matrix.h
+    third/colmap/geometry/pose.h
+    third/colmap/geometry/rigid3.h
+    third/colmap/geometry/sim3.h
+    third/colmap/geometry/triangulation.h
+    third/colmap/math/math.h
+    third/colmap/math/matrix.h
+    third/colmap/math/polynomial.h
+    third/colmap/math/random.h
+    third/colmap/optim/loransac.h
+    third/colmap/optim/random_sampler.h
+    third/colmap/optim/ransac.h
+    third/colmap/optim/sampler.h
+    third/colmap/optim/support_measurement.h
+    third/colmap/scene/camera.h
+    third/colmap/scene/database.h
+    third/colmap/scene/image.h
+    third/colmap/scene/point2d.h
+    third/colmap/scene/projection.h
+    third/colmap/scene/two_view_geometry.h
+    third/colmap/scene/visibility_pyramid.h
+    third/colmap/sensor/models.h
+    third/colmap/util/eigen_alignment.h
+    third/colmap/util/endian.h
+    third/colmap/util/logging.h
+    third/colmap/util/misc.h
+    third/colmap/util/sqlite3_utils.h
+    third/colmap/util/string.h
+    third/colmap/util/threading.h
+    third/colmap/util/timer.h
+    third/colmap/util/types.h
+)
+
+
+# glomap
+set(SOURCES
+    controllers/global_mapper.cc
+    controllers/option_manager.cc
+    controllers/track_establishment.cc
+    estimators/bundle_adjustment.cc
+    estimators/global_positioning.cc
+    estimators/global_rotation_averaging.cc
+    estimators/gravity_refinement.cc
+    estimators/relpose_estimation.cc
+    estimators/view_graph_calibration.cc
+    io/colmap_converter.cc
+    io/gravity_io.cc
+    math/gravity.cc
+    math/rigid3d.cc
+    math/tree.cc
+    math/two_view_geometry.cc
+    processors/image_pair_inliers.cc
+    processors/image_undistorter.cc
+    processors/relpose_filter.cc
+    processors/track_filter.cc
+    processors/view_graph_manipulation.cc
+    scene/view_graph.cc
+)
+
+set(HEADERS
+    controllers/global_mapper.h
+    controllers/option_manager.h
+    controllers/track_establishment.h
+    estimators/bundle_adjustment.h
+    estimators/cost_function.h
+    estimators/global_positioning.h
+    estimators/global_rotation_averaging.h
+    estimators/gravity_refinement.h
+    estimators/relpose_estimation.h
+    estimators/optimization_base.h
+    estimators/view_graph_calibration.h
+    io/colmap_converter.h
+    io/gravity_io.h
+    math/gravity.h
+    math/l1_solver.h
+    math/rigid3d.h
+    math/tree.h
+    math/two_view_geometry.h
+    math/union_find.h
+    processors/image_pair_inliers.h
+    processors/image_undistorter.h
+    processors/relpose_filter.h
+    processors/track_filter.h
+    processors/view_graph_manipulation.h
+    scene/camera.h
+    scene/image_pair.h
+    scene/image.h
+    scene/track.h
+    scene/types_sfm.h
+    scene/types.h
+    type.h
+)
+

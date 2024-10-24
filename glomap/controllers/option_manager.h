@@ -10,6 +10,7 @@
 
 namespace glomap {
 
+// note: 提前声明
 struct GlobalMapperOptions;
 struct ViewGraphCalibratorOptions;
 struct RelativePoseEstimationOptions;
@@ -17,7 +18,6 @@ struct RotationEstimatorOptions;
 struct TrackEstablishmentOptions;
 struct GlobalPositionerOptions;
 struct BundleAdjusterOptions;
-struct TriangulatorOptions;
 struct InlierThresholdOptions;
 
 class OptionManager {
